@@ -1,0 +1,204 @@
+<html>
+
+<head>
+    <title>Star Wars</title>
+    <style>
+        body {
+            margin: 0;
+        }
+        
+        canvas {
+            width: 100%;
+            height: 100%
+        }
+    </style>
+</head>
+
+<body>
+    <script src="./js/three.js"></script>
+    <script src="./js/loaders/GLTFLoader.js"></script>
+    <script src="./js/controls/OrbitControls.js"></script>
+
+    <script>
+        //Inicar render da cena
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 1000);
+        var renderer = new THREE.WebGLRenderer();
+        document.body.appendChild(renderer.domElement);
+        var controls = new THREE.OrbitControls(camera, renderer.domElement);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+        //Carregar texturas
+        var loader = new THREE.TextureLoader();
+        solarPanelImg = loader.load("img/Satelite/solarPanel/solarpanel1.png");
+        earthCloudImg = loader.load("img/earth/cloud-tranparent.png");
+        deathStarImg = loader.load("img/deathstar/deathstar2.png");
+        sunCloudImg = loader.load("img/sol/cloud-tranparent.png");
+        sateliteImg = loader.load("img/satelite/satelite.png");
+        moonBump = loader.load('img/lua/normal-map-lua.jpg');
+        sunBump = loader.load("img/sol/normal-map-sun.jpg");
+        earthBump = loader.load("img/earth/normal.jpg");
+        starImg = loader.load("img/galaxy/galaxy1.png");
+        earthImg = loader.load("img/earth/earth.jpg");
+        // bgImg = loader.load("img/fundos/ceu.jpg");
+        moonImg = loader.load("img/lua/lua.jpg")
+        sunImg = loader.load("img/sol/sun.jpg")
+                
+        //Iluminação
+        const light = new THREE.PointLight( 0xffffff, 2, 100 );
+        const abLight = new THREE.AmbientLight(0xffffff, 0.5)
+        scene.add( light);
+        //scene.background = bgImg;
+
+        //importar modelos
+        const gltfLoader = new THREE.GLTFLoader();
+
+        //Criar geometrias
+        const sateliteGeometry = new THREE.CylinderGeometry(0.09, 0.09, 0.5, 36)
+        const earthCloudGeometry = new THREE.SphereGeometry(2.1, 128, 128);
+        const solarPanelGeometry = new THREE.BoxGeometry(0.01, 0.3, 0.9);
+        const deathStarGeometry = new THREE.SphereGeometry(2, 64, 32);
+        const earthGeometry = new THREE.SphereGeometry(2, 128, 128);
+        const moonGeometry = new THREE.SphereGeometry(0.5, 64, 64);
+        const starGeometry = new THREE.SphereGeometry(150, 64, 64);
+        const sunCloudGeometry = new THREE.SphereGeometry(5.1, 64, 64);
+        const sunGeometry = new THREE.SphereGeometry(5, 64, 64);
+
+        //Criar materiais
+        var sunMaterial = new THREE.MeshBasicMaterial({
+            map: sunImg,
+        });
+        var sunCloudMaterial = new THREE.MeshBasicMaterial({
+            map: sunCloudImg,
+            transparent: true,
+        });
+        var earthMaterial = new THREE.MeshStandardMaterial({
+            map: earthImg,
+            normalMap: earthBump,
+        });
+        var earthCloudMaterial = new THREE.MeshBasicMaterial({
+            map: earthCloudImg,
+            transparent: true,
+        });
+        var starMaterial = new THREE.MeshBasicMaterial({
+            map: starImg,
+            side: THREE.BackSide,
+            transparent: true,
+        });
+        var moonMaterial = new THREE.MeshPhongMaterial({
+            map: moonImg,
+            normalMap: moonBump,
+        });
+        var deathstarMaterial = new THREE.MeshPhongMaterial({
+            map: deathStarImg
+        })
+        var sateliteMaterial = new THREE.MeshPhongMaterial({
+            map: sateliteImg,
+            refractionRatio: 0,
+        })
+        var solarPanelMaterial = new THREE.MeshPhongMaterial({
+            map: solarPanelImg,
+        })
+
+        //Formas primitivas
+        const terraCloud = new THREE.Mesh(earthCloudGeometry, earthCloudMaterial);
+        const solarPanel = new THREE.Mesh(solarPanelGeometry, solarPanelMaterial);
+        const deathstar = new THREE.Mesh(deathStarGeometry, deathstarMaterial);
+        const satelite = new THREE.Mesh(sateliteGeometry, sateliteMaterial);
+        const sunCloud = new THREE.Mesh(sunCloudGeometry, sunCloudMaterial);
+        const terra = new THREE.Mesh(earthGeometry, earthMaterial);
+        const moon = new THREE.Mesh(moonGeometry, moonMaterial);
+        const star = new THREE.Mesh(starGeometry, starMaterial);
+        const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+       
+
+        //Criar objeto
+        const moonObj = new THREE.Object3D();
+        moonObj.add(moon);
+        terra.add(terraCloud, moonObj);
+
+        //Criar grupo de objetos
+        const group = new THREE.Group();
+
+        const gSatelite = new THREE.Group();
+        gSatelite.add(satelite);
+        gSatelite.add(solarPanel)
+
+        //Agrupar Satelite com a
+        const groupEarth = new THREE.Group();
+        groupEarth.add(terra)
+        groupEarth.add(gSatelite)
+
+        const terraObj = new THREE.Object3D();
+        terraObj.add(groupEarth)
+
+        //Adicionar formas na cena
+        scene.add(sun, star)
+        sun.add(terraObj, sunCloud)
+
+        //Posição da camera
+        camera.position.x = 30;
+        camera.position.y = 1;
+        camera.position.z = 1;
+
+        //Mover deathstar
+        deathstar.position.z = -10
+        deathstar.position.y = 5
+        deathstar.position.x = -2
+        deathstar.rotation.y = -2.4
+        deathstar.rotation.x = 0.5
+
+        //posicao dos grupos
+        gSatelite.position.z = 3
+
+        //posicao da lua
+        moon.position.z = 5
+
+        //Rotacao da terra
+        terra.rotateX(-0.3)
+
+        //Rotacao do Sol
+        sun.rotateX(0.3)
+
+        //Rotacao grupo terra
+        groupEarth.position.z = 20
+
+        //Matrix de rotação do satélite
+        const mx = new THREE.Matrix4();
+        const my = new THREE.Matrix4();
+        mx.makeRotationX(0.009);
+        my.makeRotationY(-0.0050);
+
+        //---------
+        var time = 0;
+        var animate = function() {
+            time += 0.01;
+            requestAnimationFrame(animate);
+
+            //rotação dos astros
+            sun.rotateY(0.001);
+            sunCloud.rotateY(0.002)
+            sunCloud.rotateX(0.001)
+            terra.rotateY(0.004);
+            terraObj.rotateY(0.002)
+            moon.rotateY(0.0007)
+            moonObj.rotateY(0.0004)
+            terraCloud.rotateY(-0.0005)
+            terraCloud.rotateX(0.005)
+        
+            //rotação do satélite
+            gSatelite.applyMatrix4(mx);
+            gSatelite.applyMatrix4(my);
+
+            controls.update();
+            //Um pouco de responsividade
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.updateProjectionMatrix();
+            renderer.render(scene, camera);
+        };
+        animate();
+    </script>
+</body>
+
+</html>

@@ -19,7 +19,7 @@
     <script src="./js/three.js"></script>
     <script src="./js/loaders/GLTFLoader.js"></script>
     <script src="./js/controls/OrbitControls.js"></script>
-    
+
     <script>
         //Inicar render da cena
         var scene = new THREE.Scene();
@@ -45,10 +45,14 @@
         moonImg = loader.load("img/lua/lua.jpg")
         sunImg = loader.load("img/sol/sun.jpg")
 
+        console.log(sunImg)
+
         //Iluminação
-        const light = new THREE.PointLight( 0xffffff, 2, 1000 );
-        const abLight = new THREE.AmbientLight(0xffffff, 0.5)
-        scene.add( light);
+        const sunLight = new THREE.PointLight( 0xffffff, 1, 100 );
+        const deathstarLight = new THREE.SpotLight( 0x90EE90 );
+        deathstarLight.position.set(-40, 10, -50)
+        const abLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(abLight, sunLight, deathstarLight);
         //scene.background = bgImg;
 
         //importar modelos
@@ -70,16 +74,18 @@
         gltfLoader.load('assets/x-wing/scene.gltf', (modeloXWing) => {
             xWingModel = modeloXWing;
             //Transformações do GLTF
-            modeloXWing.scene.scale.set(1.5, 1.5, 1.5)
+            modeloXWing.scene.scale.set(3, 3, 3)
             modeloXWing.scene.position.z = -30
             modeloXWing.scene.position.x = -40
             modeloXWing.scene.rotateY(1.75)
+            modeloXWing.scene.rotateX(.05);
+            modeloXWing.scene.rotateZ(-.5);
             const root = modeloXWing.scene;
             scene.add(root)
         });
 
 
-        //Criar geometrias
+        //Criar Objetos
         const sateliteGeometry = new THREE.CylinderGeometry(0.09, 0.09, 0.5, 36)
         const earthCloudGeometry = new THREE.SphereGeometry(2.1, 128, 128);
         const solarPanelGeometry = new THREE.BoxGeometry(0.01, 0.3, 0.9);

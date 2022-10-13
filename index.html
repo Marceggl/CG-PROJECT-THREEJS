@@ -106,6 +106,8 @@
         var earthMaterial = new THREE.MeshStandardMaterial({
             map: earthImg,
             normalMap: earthBump,
+            specular: 0x333333,
+		    shininess: 15,
         });
         var earthCloudMaterial = new THREE.MeshBasicMaterial({
             map: earthCloudImg,
